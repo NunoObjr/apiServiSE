@@ -36,7 +36,7 @@ app.use('/users',usersRoute)
 app.use('/servico',servicoRoute)
 app.use('/prestador',prestadorRoute)
 app.use('/users/avl',avaliacaoRoute)
-app.listen(3000);
+app.listen(config.APP_URL);
 
 module.exports = app;
 
