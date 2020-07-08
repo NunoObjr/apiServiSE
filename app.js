@@ -36,7 +36,7 @@ app.use('/users',usersRoute)
 app.use('/servico',servicoRoute)
 app.use('/prestador',prestadorRoute)
 app.use('/users/avl',avaliacaoRoute)
-app.listen(config.APP_URL);
+app.listen(process.env.PORT || 3000);
 
 module.exports = app;
 
