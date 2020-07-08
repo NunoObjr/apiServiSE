@@ -11,12 +11,14 @@ const config = ()=>{
         case 'hml':
             return{
                 bd_string:'mongodb+srv://nunoobjr:Junior123@servise-zrnqe.mongodb.net/<dbname>?retryWrites=true&w=majority',
-                
+                jwt_pass:'admin123',
+                jwt_expires_in:'7d'
             }
         case 'prod':
             return{
                 bd_string:'mongodb+srv://nunoobjr:Junior123@servise-zrnqe.mongodb.net/<dbname>?retryWrites=true&w=majority',
-                
+                jwt_pass:'admin123',
+                jwt_expires_in:'7d'
         }
     }
 }
