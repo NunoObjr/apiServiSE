@@ -8,4 +8,4 @@ const config = {
 }
 
 console.log(env.toUpperCase())
-module.exports = config()
+module.exports = config
