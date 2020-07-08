@@ -7,7 +7,7 @@ const auth = require('../middleware/auth')
 const config = require('../config/config')
 
 const createUserToken = (userId)=>{
-    return jwt.sign({ id:userId}, 'admin123', {expiresIn: '7d'})
+    return jwt.sign({ id:userId}, config.jwt_pass, {expiresIn: config.jwt_expires_in})
 }
 
 router.get('/', async (req,res)=>{

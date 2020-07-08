@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const config = require('./config/config')
 
-const url = "mongodb+srv://nunoobjr:Junior123@servise-zrnqe.mongodb.net/<dbname>?retryWrites=true&w=majority"
+const url = config.bd_string
 const options = { poolSize: 5, useNewUrlParser:true, useUnifiedTopology:true };
 
 mongoose.connect(url, options);
@@ -36,8 +36,7 @@ app.use('/users',usersRoute)
 app.use('/servico',servicoRoute)
 app.use('/prestador',prestadorRoute)
 app.use('/users/avl',avaliacaoRoute)
-var porta = process.env.PORT || 3000
-app.listen(porta);
+app.listen(3000);
 
 module.exports = app;
 
