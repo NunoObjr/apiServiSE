@@ -7,6 +7,9 @@ const auth = require('../middleware/auth')
 const config = require('../config/config')
 const ServicoAgendado = require('../model/servicoAgendado')
 const Prestador = require("../model/prestadorDeServico")
+const Imagem = require("../model/imagem")
+const multer = require('multer')
+const multerConfig = require('../multerConfig/multer')
 
 const createUserToken = (userId)=>{
     return jwt.sign({ id:userId}, config.jwt_pass, {expiresIn: config.jwt_expires_in})
@@ -14,7 +17,7 @@ const createUserToken = (userId)=>{
 
 router.get('/', async (req,res)=>{
     try{
-        const users = await Users.find({});
+        const users = await Users.find({}).populate('foto');
         return res.send(users);
 
     }catch(error){
@@ -22,16 +25,30 @@ router.get('/', async (req,res)=>{
     }
 });
 
-router.post('/create', async (req,res)=>{
+router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
+    console.log('req file')
+    console.log(req.file)
+    const { originalname: name, size,filename: key, location: url = "" } = req.file;
     const obj = req.body;
     if(!obj.email || !obj.senha || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
     
     try{
-       if(await Users.findOne({cpf:obj.cpf})) return res.status(400).send({error:"Usuario ja existe"})
+        if(await Users.findOne({cpf:obj.cpf})) return res.status(400).send({error:"Usuario ja existe"})
 
         const user = await  Users.create(req.body)
-        user.senha = undefined;
-        return res.status(201).send({user,token:createUserToken(user.id)});
+        const imagem = await Imagem.create({
+            name,
+            size,
+            key,
+            url,
+         })
+        imagem.usuario = user._id
+        imagem.save()
+        user.foto = imagem._id
+        user.save()
+        const usuarioFinal = await Users.findById(user._id).populate('foto')
+        usuarioFinal.senha = undefined;
+        return res.status(201).send({usuarioFinal,token:createUserToken(usuarioFinal._id)});
 
     }catch(err){
         return res.status(500).send({error: 'erro ao criar',erro:err})

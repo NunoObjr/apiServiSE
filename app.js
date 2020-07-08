@@ -1,8 +1,12 @@
+require('dotenv').config()
+
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const config = require('./config/config')
 const cors = require("cors")
+const bodyParser = require('body-parser')
+const path = require('path')
 
 const url = config.bd_string
 const options = { poolSize: 5, useNewUrlParser:true, useUnifiedTopology:true };
@@ -22,8 +26,8 @@ mongoose.connection.on('connected',()=>{
     console.log("App conectada")
 })
 app.use(cors())
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 const indexRoute = require('./Routes/index');
 const usersRoute = require('./Routes/users');
@@ -32,7 +36,7 @@ const prestadorRoute = require('./Routes/prestadorDeServico');
 const avaliacaoRoute = require('./Routes/avaliacao')
 
 app.use('/',indexRoute)
-app.use('/users',usersRoute)
+app.use('/users',usersRoute,express.static(path.resolve(__dirname,"./uploads/")))
 app.use('/servico',servicoRoute)
 app.use('/prestador',prestadorRoute)
 app.use('/users/avl',avaliacaoRoute)

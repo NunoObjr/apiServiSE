@@ -12,6 +12,7 @@ const UserSchema = new Schema({
     cpf: {type: String, required: true, unique:true, lowercase:true},
     senha: {type: String, required:true, select:false},
     agendamentos:[{type:Schema.Types.ObjectId ,required:false, ref: 'ServicoAgendado'}],
+    foto:{type:Schema.Types.ObjectId, required:false, ref: 'Imagem'},
     created: {type: Date, default:Date.now}
 }, { collection : 'users' })
 

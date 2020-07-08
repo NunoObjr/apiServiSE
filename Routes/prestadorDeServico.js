@@ -30,7 +30,7 @@ router.post('/create', async (req,res)=>{
 
         const user = await  Prestador.create(req.body)
         user.senha = undefined;
-        return res.status(201).send({user,token:createUserToken(user.id)});
+        return res.status(201).send({user,token:createUserToken(user._id)});
 
     }catch(err){
         return res.status(500).send({error: 'erro ao buscar'})
@@ -46,7 +46,7 @@ router.post('/login', async (req,res)=>{
         const senha_teste = await bcrypt.compare(senha, user.senha);
         if(!senha_teste) return res.status(401).send({permissao_logar:false,error: 'dados invalidos'})
         user.senha = undefined
-        return res.send({permissao_logar:true, user,token:createUserToken(user.id)})
+        return res.send({permissao_logar:true, user,token:createUserToken(user._id)})
     }catch(err){
         return res.status(500).send({error: 'erro ao buscar'})
     }
