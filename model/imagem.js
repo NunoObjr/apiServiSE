@@ -6,7 +6,7 @@ const ImagemSchema = new Schema({
    size:Number,
    key:String,
    url:String,
-   usuario: {type: Schema.Types.ObjectId, required:true, ref:'users'},
+   usuario: {type: Schema.Types.ObjectId, required:false, ref:'users'},
    created: {type: Date, default:Date.now}
 }, { collection : 'Imagem' })
 
