@@ -107,7 +107,7 @@ router.post('/agendar', auth,async (req,res)=>{
 router.get('/agendamentos', auth,async(req,res)=>{
     try{
         const usuarioId = res.locals.autenticacao.id
-        const user = await Users.findById(usuarioId).populate({path:'agendamentos',populate:{path:'prestador'}})
+        const user = await Users.findById(usuarioId).populate({path:'agendamentos',populate:{path:'prestador',populate:{path:'servicos'}}})
         return res.status(200).send({data:user})
     }catch(error){
         return res.status(500).send({error: "houve uma falha de autenticacao"})
