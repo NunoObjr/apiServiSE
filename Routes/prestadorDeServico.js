@@ -12,7 +12,7 @@ const createUserToken = (userId)=>{
 
 router.get('/', async (req,res)=>{
     try{
-        const prestador = await Prestador.find().populate('servicos');
+        const prestador = await Prestador.find().populate({path:'servicos',populate:{path:'avaliacao'}});
         return res.status(200).send(prestador);
 
     }catch(error){
