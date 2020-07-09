@@ -105,7 +105,7 @@ router.post('/login', async (req,res)=>{
     const {cpf,senha} = req.body;
     if(!cpf || !senha) return res.status(400).send({error:"dados insuficientes"})
     try{
-        const user =  await Users.findOne({cpf}).select("+senha")
+        const user =  await Users.findOne({cpf}).select("+senha").populate('foto')
         if(!user) return res.status(401).send({error: 'dados invalidos'})
         const senha_teste = await bcrypt.compare(senha, user.senha);
         if(!senha_teste) return res.status(401).send({permissao_logar:false,error: 'dados invalidos'})
