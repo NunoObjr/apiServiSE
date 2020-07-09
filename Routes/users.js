@@ -123,7 +123,12 @@ router.post('/login', async (req,res)=>{
         const senha_teste = await bcrypt.compare(senha, user.senha);
         if(!senha_teste) return res.status(401).send({permissao_logar:false,error: 'dados invalidos'})
         user.senha = undefined
-        return res.status(200).send({permissao_logar:true, user,token:createUserToken(user.id)})
+        return res.status(200).send({
+            permissao_logar:true, nome:user.nome,
+            email:user.email,cpf:user.cpf,rua:user.rua,
+            complemento:user.complemento,id:user._id,
+            telefone:user.telefone,foto:user.foto.url
+            ,token:createUserToken(user.id)})
     }catch(err){
         return res.status(500).send({error: 'erro ao buscar'})
     }

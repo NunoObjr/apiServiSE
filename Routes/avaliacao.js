@@ -7,6 +7,18 @@ const Prestador = require('../model/prestadorDeServico')
 const Users = require('../model/user');
 const auth = require('../middleware/auth')
 
+router.post('/avaliacoes', async (req,res)=>{
+    const {id} = req.body
+    if(!id) return res.status(400).send({error:"dados insuficientes",body:req.body})
+    try{
+        const avaliacoes = Avaliacao.findById(id)
+        return res.status(200).send({avaliacoes})
+    }catch(err){
+
+        return res.status(500).send({message:"Nao foi possivel pegar as avaliacoes",err})
+    }
+})
+
 router.post('/avaliar',auth,async (req,res)=>{
     const obj = req.body
 
