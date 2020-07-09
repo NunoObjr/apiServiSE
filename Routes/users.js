@@ -26,8 +26,6 @@ router.get('/', async (req,res)=>{
 });
 
 router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
-    console.log('req file')
-    console.log(req.file)
     const { originalname: name, size,filename: key, location: url = "" } = req.file;
     const obj = req.body;
     if(!obj.email || !obj.senha || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
@@ -35,20 +33,24 @@ router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
     try{
         if(await Users.findOne({cpf:obj.cpf})) return res.status(400).send({error:"Usuario ja existe"})
 
-        const user = await  Users.create(req.body)
+        const user = await  Users.create(obj)
         const imagem = await Imagem.create({
             name,
             size,
             key,
             url,
+            usuario:user
          })
-        imagem.usuario = user._id
-        imagem.save()
-        user.foto = imagem._id
-        user.save()
-        const usuarioFinal = await Users.findById(user._id).populate('foto')
-        usuarioFinal.senha = undefined;
-        return res.status(201).send({usuarioFinal,token:createUserToken(usuarioFinal._id)});
+        const usuario = await Users.findById(user._id)
+        usuario.foto = imagem
+        usuario.save()
+        return res.status(201).send({
+            nome:usuario.nome,email:usuario.email,
+            foto:usuario.foto.url,cpf:usuario.cpf,
+            rua:usuario.rua,complemento:usuario.complemento,
+            id:usuario._id,telefone:usuario.telefone,
+            token:createUserToken(usuario._id)
+        })
 
     }catch(err){
         return res.status(500).send({error: 'erro ao criar',erro:err})
