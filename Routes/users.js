@@ -26,7 +26,9 @@ router.get('/', async (req,res)=>{
 });
 
 router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
-    const { originalname: name, size,filename: key, location: url = "" } = req.file;
+    if(req.file){
+        const { originalname: name, size,filename: key, location: url = "" } = req.file;
+    }
     const obj = req.body;
     if(!obj.email || !obj.senha || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
     
@@ -34,6 +36,7 @@ router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
         if(await Users.findOne({cpf:obj.cpf})) return res.status(400).send({error:"Usuario ja existe"})
 
         const user = await  Users.create(obj)
+        if(req.file){
         const imagem = await Imagem.create({
             name,
             size,
@@ -41,16 +44,26 @@ router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
             url,
             usuario:user
          })
-        const usuario = await Users.findById(user._id)
-        usuario.foto = imagem
-        usuario.save()
-        return res.status(201).send({
-            nome:usuario.nome,email:usuario.email,
-            foto:usuario.foto.url,cpf:usuario.cpf,
-            rua:usuario.rua,complemento:usuario.complemento,
-            id:usuario._id,telefone:usuario.telefone,
-            token:createUserToken(usuario._id)
-        })
+         const usuario = await Users.findById(user._id)
+         usuario.foto = imagem
+         usuario.save()
+         return res.status(201).send({
+             nome:usuario.nome,email:usuario.email,
+             foto:usuario.foto.url,cpf:usuario.cpf,
+             rua:usuario.rua,complemento:usuario.complemento,
+             id:usuario._id,telefone:usuario.telefone,
+             token:createUserToken(usuario._id)
+         })
+        }else{
+            const usuario = await Users.findById(user._id)
+            return res.status(201).send({
+                nome:usuario.nome,email:usuario.email,
+                cpf:usuario.cpf,rua:usuario.rua,
+                complemento:usuario.complemento,
+                id:usuario._id,telefone:usuario.telefone,
+                token:createUserToken(usuario._id)
+            })
+        }
 
     }catch(err){
         return res.status(500).send({error: 'erro ao criar',erro:err})
