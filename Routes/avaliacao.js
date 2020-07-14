@@ -5,7 +5,8 @@ const ServicoAgendado = require('../model/servicoAgendado');
 const Avaliacao = require('../model/avaliacao')
 const Prestador = require('../model/prestadorDeServico')
 const Users = require('../model/user');
-const auth = require('../middleware/auth')
+const auth = require('../middleware/auth');
+const { ObjectId } = require('mongoose');
 
 
 router.post('/avaliar',auth,async (req,res)=>{
@@ -18,39 +19,36 @@ router.post('/avaliar',auth,async (req,res)=>{
         const user = await Users.findById(res.locals.autenticacao.id)
         avaliacao.usuario=user
         avaliacao.save()
-        const servicoAgendado = await ServicoAgendado.findById(obj.servicoAgendado)
-        servicoAgendado.avaliacao.push(avaliacao)
+        const servisoAgendado = await ServicoAgendado.findById(obj.servicoAgendado).populate('avaliacao')
+        servisoAgendado.avaliacao.push(avaliacao)
         let nota =0
-            for(let i =0; i<servicoAgendado.avaliacao.length; i++){
-                nota = nota + servicoAgendado.avaliacao[i].nota
+            for(let i =0; i<servisoAgendado.avaliacao.length; i++){
+                nota = nota + servisoAgendado.avaliacao[i].nota
             }
-        nota=(nota/servicoAgendado.avaliacao.length)
-        servicoAgendado.nota = nota
-        servicoAgendado.save()
-        const serviso = await Servico.find({nome:servicoAgendado.nome})
-        serviso[0].avaliacao.push(avaliacao)
+        nota=(nota/servisoAgendado.avaliacao.length)
+        servisoAgendado.nota = nota
+        servisoAgendado.save()
+        const serv = await Servico.findOne({prestador:servisoAgendado.prestador,nome:servisoAgendado.nome}).populate('avaliacao')
+        serv.avaliacao.push(avaliacao)
+        serv.save()
         let nota2 =0
-            for(let i =0; i<serviso[0].avaliacao.length; i++){
-                nota2 = nota2 + serviso[0].avaliacao[i].nota
+            for(let i =0; i<serv.avaliacao.length; i++){
+                nota2 = nota2 + serv.avaliacao[i].nota
             }
-        nota2=(nota2/serviso[0].avaliacao.length)
-        serviso[0].nota = avaliacao.nota
-        serviso[0].save()
-        const prestadorDeServico =  await Prestador.findById(servicoAgendado.prestador).populate({path:'servicos',populate:{path:'avaliacao'}})
-        const servicos = prestadorDeServico.servicos
+        nota2=(nota2/serv.avaliacao.length)
+        serv.nota = nota2
+        serv.save()
+        const prestadorDeServico =  await Prestador.findById(servisoAgendado.prestador).populate('servicos')
         let nota3 = 0
-        for(let i=0;i<servicos.length;i++){
-            let notaAvaliacoes = 0
-            for(let j=0; j<servicos[i].avaliacao.length;j++){
-                notaAvaliacoes = notaAvaliacoes + servicos[i].avaliacao[j].nota
-            }
-            nota3 = nota3 + (notaAvaliacoes/(servicos[i].avaliacao.length))
+        for(let i=0;i<prestadorDeServico.servicos.length;i++){
+            nota3 = nota3 + prestadorDeServico.servicos[i].nota
         }
-        nota3 = (nota3/(servicos.length))
+        nota3 = (nota3/(prestadorDeServico.servicos.length))
         prestadorDeServico.nota = nota3
         prestadorDeServico.save()
         return res.status(201).send({message:"Avaliacao criada",avaliacao})
     }catch(err){
+        console.log(err)
         return res.status(500).send({error:"Nao foi possivel criar uma avaliacao",body:obj,err})
     }
 });

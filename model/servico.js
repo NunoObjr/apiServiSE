@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const ServicoSchema = new Schema({
     nome: {type: String, required: true},
     preco: {type: Number, required:true},
-    nota:{type:Number, required:true},
+    nota:{type:Number, required:false, default:0},
     horario: [{
         hora:{type: String, required:true},
         dia:{type: String, required:true}

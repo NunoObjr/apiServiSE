@@ -13,7 +13,7 @@ const PrestadorSchema = new Schema({
     cpf: {type: String, required: true, unique:true, lowercase:true},
     senha: {type: String, required:true, select:false},
     servicos:[{type:Schema.Types.ObjectId ,required:false, ref: 'Servico'}],
-    nota:{type: Number, required:false},
+    nota:{type: Number, required:false, default:0},
     created: {type: Date, default:Date.now}
 }, { collection : 'Prestador' })
 
