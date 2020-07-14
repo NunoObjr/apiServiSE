@@ -26,9 +26,6 @@ router.get('/', async (req,res)=>{
 });
 
 router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
-    if(req.file){
-        const { originalname: name, size,filename: key, location: url = "" } = req.file;
-    }
     const obj = req.body;
     if(!obj.email || !obj.senha || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
     
@@ -37,16 +34,17 @@ router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
 
         const user = await  Users.create(obj)
         if(req.file){
-        const imagem = await Imagem.create({
-            name,
-            size,
-            key,
-            url,
-            usuario:user
-         })
-         const usuario = await Users.findById(user._id)
-         usuario.foto = imagem
-         usuario.save()
+            const { originalname: name, size,filename: key, location: url = "" } = req.file;
+            const imagem = await Imagem.create({
+                name,
+                size,
+                key,
+                url,
+                usuario:user
+            })
+            const usuario = await Users.findById(user._id)
+            usuario.foto = imagem
+            usuario.save()
          return res.status(201).send({
              nome:usuario.nome,email:usuario.email,
              foto:usuario.foto.url,cpf:usuario.cpf,
@@ -69,6 +67,41 @@ router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
         return res.status(500).send({error: 'erro ao criar',erro:err})
     }
 });
+
+router.put('/update', auth,async (req, res)=>{
+    const obj = req.body;
+    if(!obj.email || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
+    try{
+        const usuarioId = res.locals.autenticacao.id
+        const user = await Users.findById(usuarioId).populate('foto');
+        user.nome = obj.nome;
+        user.cpf = obj.cpf;
+        user.telefone = obj.telefone;
+        user.rua = obj.rua
+        user.email = obj.email
+        user.complemento = obj.complemento
+        if(user.foto !== null && req.file){
+            const imagem = await Imagem.findById(user.foto._id)
+            imagem.deleteOne()
+        }
+        if(req.file){
+            const { originalname: name, size,filename: key, location: url = "" } = req.file;
+            const imagem = await Imagem.create({
+                name,
+                size,
+                key,
+                url,
+                usuario:user
+            })
+            user.foto = imagem
+        }
+        user.save()
+        return res.status(200).send({message:"usuario atualizado com sucesso",user})
+
+    }catch(error){
+        return res.status(500).send({message:"erro ao buscar usuario",error})
+    }
+})
 
 router.delete('/delete', async (req,res)=>{
     const {ID} = req.body;
