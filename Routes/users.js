@@ -10,6 +10,7 @@ const Prestador = require("../model/prestadorDeServico")
 const Imagem = require("../model/imagem")
 const multer = require('multer')
 const multerConfig = require('../multerConfig/multer')
+const validarCpf = require('validar-cpf');
 
 const createUserToken = (userId)=>{
     return jwt.sign({ id:userId}, config.jwt_pass, {expiresIn: config.jwt_expires_in})
@@ -28,7 +29,7 @@ router.get('/', async (req,res)=>{
 router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
     const obj = req.body;
     if(!obj.email || !obj.senha || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
-    
+    if(!(validarCpf(obj.cpf))) return res.status(400).send("Cpf invalido")
     try{
         if(await Users.findOne({cpf:obj.cpf})) return res.status(400).send({error:"Usuario ja existe"})
 
