@@ -3,12 +3,12 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt')
 
 const UserSchema = new Schema({
-    nome: {type: String, required: true, lowercase:true},
-    rua: {type: String, required: true, lowercase:true},
-    complemento: {type: String, required: false, lowercase:true},
-    telefone: {type: String, required: true, lowercase:true},
-    email: {type: String, required: true, lowercase:true},
-    cpf: {type: String, required: true, unique:true, lowercase:true},
+    nome: {type: String, required: true},
+    rua: {type: String, required: true},
+    complemento: {type: String, required: false},
+    telefone: {type: String, required: true},
+    email: {type: String, required: true},
+    cpf: {type: String, required: true, unique:true},
     senha: {type: String, required:true, select:false},
     agendamentos:[{type:Schema.Types.ObjectId ,required:false, ref: 'ServicoAgendado'}],
     foto:{type:Schema.Types.ObjectId, required:false, ref: 'Imagem',default:null},

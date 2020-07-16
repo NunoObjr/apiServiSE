@@ -4,13 +4,13 @@ const bcrypt = require('bcrypt')
 const Servico = require('./servico')
 
 const PrestadorSchema = new Schema({
-    nome: {type: String, required: true, lowercase:true},
-    email: {type: String, required: true, lowercase:true},
-    rua: {type: String, required: true, lowercase:true},
-    foto: {type: String, required: false, lowercase:true},
-    complemento: {type: String, required: false, lowercase:true},
-    telefone: {type: String, required: true, lowercase:true},
-    cpf: {type: String, required: true, unique:true, lowercase:true},
+    nome: {type: String, required: true},
+    email: {type: String, required: true},
+    rua: {type: String, required: true},
+    foto: {type: String, required: false},
+    complemento: {type: String, required: false},
+    telefone: {type: String, required: true},
+    cpf: {type: String, required: true, unique:true},
     senha: {type: String, required:true, select:false},
     servicos:[{type:Schema.Types.ObjectId ,required:false, ref: 'Servico'}],
     nota:{type: Number, required:false, default:0},
