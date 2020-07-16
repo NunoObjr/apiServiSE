@@ -148,6 +148,27 @@ router.get('/agendamentos', auth,async(req,res)=>{
     }
 })
 
+router.delete('/cancelarAgendamento', auth, async(req,res)=>{
+    const { idAgendamento } = req.body
+    if(!idAgendamento) return res.status(400).send({error:"dados insuficientes"})
+    try{
+        const agendamento = await ServicoAgendado.findById(idAgendamento)
+        if(agendamento.status !== "Pendente") return res.status(400).send({error:"So é possivel cancelar um agendamento pendente"})
+        const usuarioId = res.locals.autenticacao.id
+        const user = await Users.findById(usuarioId)
+        var novoVetor = []
+        for(let i=0; i<user.agendamentos.length;i++){
+            if(!user.agendamentos[0].equals(idAgendamento)) novoVetor.push(user.agendamentos[i])
+        }
+        agendamento.deleteOne()
+        user.agendamentos = novoVetor
+        user.save()
+        return res.status(200).send("Servico cancelado")
+    }catch(err){
+        return res.status(500).send({message:"Não foi possivel cancelar o agendamento",error:err})
+    }
+})
+
 router.post('/login', async (req,res)=>{
     const {cpf,senha} = req.body;
     if(!cpf || !senha) return res.status(400).send({error:"dados insuficientes"})
