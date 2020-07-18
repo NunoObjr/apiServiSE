@@ -69,12 +69,50 @@ router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
     }
 });
 
+router.put('/updateCpf', auth,async (req, res)=>{
+    const {cpf, senha} = req.body
+    if(!cpf) return res.status(400).send({error:"dados insuficientes",body:req.body})
+    if(!(validarCpf(cpf))) return res.status(400).send("Cpf invalido")
+    try{
+        if(await Users.findOne({cpf:cpf})) return res.status(400).send({error:"Usuario ja existe"})
+        const usuarioId = res.locals.autenticacao.id
+        const user = await Users.findById(usuarioId)
+        const senha_teste = await bcrypt.compare(senha, user.senha);
+        if(senha_teste) return res.status(500).send({message:"Senha incorreta"})
+        user.cpf = cpf
+        user.save()
+        user.senha = undefined
+        return res.status(200).send({message:"usuario atualizado com sucesso",user})
+
+    }catch(error){
+        return res.status(500).send({message:"erro ao buscar usuario",error})
+    }
+})
+router.put('/updatePass', auth,async (req, res)=>{
+    const {senhaAntiga, novaSenha} = req.body
+    if(!senhaAntiga || !novaSenha) return res.status(400).send({error:"dados insuficientes",body:req.body})
+    try{
+        const usuarioId = res.locals.autenticacao.id
+        const user = await Users.findById(usuarioId)
+        const senha_teste = await bcrypt.compare(senhaAntiga, user.senha);
+        if(senha_teste) return res.status(500).send({message:"Senha incorreta"})
+        user.senha = novaSenha
+        user.save()
+        return res.status(200).send({message:"Senha atualizada com sucesso"})
+
+    }catch(error){
+        return res.status(500).send({message:"erro ao buscar usuario",error})
+    }
+})
+
 router.put('/update', auth,multer(multerConfig).single('foto'),async (req, res)=>{
     const obj = req.body;
-    if(!obj.email || !obj.nome || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
+    if(!obj.email || !obj.nome  || !obj.senha || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
     try{
         const usuarioId = res.locals.autenticacao.id
         const user = await Users.findById(usuarioId).populate('foto');
+        const senha_teste = await bcrypt.compare(obj.senha, user.senha);
+        if(senha_teste) return res.status(500).send({message:"Senha incorreta"})
         user.nome = obj.nome;
         user.telefone = obj.telefone;
         user.rua = obj.rua
@@ -97,9 +135,11 @@ router.put('/update', auth,multer(multerConfig).single('foto'),async (req, res)=
             const usuario = await Users.findById(usuarioId);
             usuario.foto = imagem
             usuario.save()
+            usuario.senha = undefined
             return res.status(200).send({message:"usuario atualizado com sucesso",usuario})
         }
         const usuario = await Users.findById(usuarioId);
+        usuario.senha = undefined
         return res.status(200).send({message:"usuario atualizado com sucesso",usuario:usuario})
 
     }catch(error){
