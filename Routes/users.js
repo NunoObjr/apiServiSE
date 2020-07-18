@@ -110,9 +110,9 @@ router.put('/update', auth,multer(multerConfig).single('foto'),async (req, res)=
     if(!obj.email || !obj.nome  || !obj.senha || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
     try{
         const usuarioId = res.locals.autenticacao.id
-        const user = await Users.findById(usuarioId).populate('foto');
+        const user = await Users.findById(usuarioId).select("+senha").populate('foto');
         const senha_teste = await bcrypt.compare(obj.senha, user.senha);
-        if(senha_teste) return res.status(500).send({message:"Senha incorreta"})
+        if(!senha_teste) return res.status(500).send({message:"Senha incorreta"})
         user.nome = obj.nome;
         user.telefone = obj.telefone;
         user.rua = obj.rua
