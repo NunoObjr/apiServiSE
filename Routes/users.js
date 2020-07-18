@@ -235,8 +235,8 @@ router.post('/login', async (req,res)=>{
 router.get('/identificarUsuario', auth,async (req,res)=>{
     try{
         const usuarioId = res.locals.autenticacao.id
-        const user = await Users.findById(usuarioId)
-        return res.send({data:user,foto:user.foto.url})
+        const user = await Users.findById(usuarioId).populate('foto')
+        return res.send({data:user})
     }catch(error){
         return res.status(500).send({error: "houve uma falha de autenticacao"})
     }
