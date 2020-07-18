@@ -69,18 +69,22 @@ router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
     }
 });
 
-router.put('/update', auth,async (req, res)=>{
+router.put('/update', auth,multer(multerConfig).single('foto'),async (req, res)=>{
     const obj = req.body;
     if(!obj.email || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
     try{
         const usuarioId = res.locals.autenticacao.id
+        if(!(validarCpf(obj.cpf))) return res.status(400).send("Cpf invalido")
         const user = await Users.findById(usuarioId).populate('foto');
+        const existe = await Users.findOne({cpf:obj.cpf})
+        if(!(user.cpf === obj.cpf) && existe) return res.status(400).send({error:"cpf ja existe"})
         user.nome = obj.nome;
         user.cpf = obj.cpf;
         user.telefone = obj.telefone;
         user.rua = obj.rua
         user.email = obj.email
         user.complemento = obj.complemento
+        user.save()
         if(user.foto !== null && req.file){
             const imagem = await Imagem.findById(user.foto._id)
             imagem.deleteOne()
@@ -94,10 +98,13 @@ router.put('/update', auth,async (req, res)=>{
                 url,
                 usuario:user
             })
-            user.foto = imagem
+            const usuario = await Users.findById(usuarioId);
+            usuario.foto = imagem
+            usuario.save()
+            return res.status(200).send({message:"usuario atualizado com sucesso",usuario})
         }
-        user.save()
-        return res.status(200).send({message:"usuario atualizado com sucesso",user,foto:user.foto.url})
+        const usuario = await Users.findById(usuarioId);
+        return res.status(200).send({message:"usuario atualizado com sucesso",usuario:usuario})
 
     }catch(error){
         return res.status(500).send({message:"erro ao buscar usuario",error})
