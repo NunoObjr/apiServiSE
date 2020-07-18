@@ -97,7 +97,7 @@ router.put('/update', auth,async (req, res)=>{
             user.foto = imagem
         }
         user.save()
-        return res.status(200).send({message:"usuario atualizado com sucesso",user})
+        return res.status(200).send({message:"usuario atualizado com sucesso",user,foto:user.foto.url})
 
     }catch(error){
         return res.status(500).send({message:"erro ao buscar usuario",error})
@@ -193,7 +193,7 @@ router.get('/identificarUsuario', auth,async (req,res)=>{
     try{
         const usuarioId = res.locals.autenticacao.id
         const user = await Users.findById(usuarioId)
-        return res.send({data:user})
+        return res.send({data:user,foto:user.foto.url})
     }catch(error){
         return res.status(500).send({error: "houve uma falha de autenticacao"})
     }
