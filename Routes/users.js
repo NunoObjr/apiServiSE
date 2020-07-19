@@ -130,12 +130,11 @@ router.put('/update', auth,multer(multerConfig).single('foto'),async (req, res)=
                 size,
                 key,
                 url,
-                usuario:user
+                usuario:user._id
             })
             const usuario = await Users.findById(usuarioId);
             usuario.foto = imagem
             usuario.save()
-            usuario.senha = undefined
             return res.status(200).send({message:"usuario atualizado com sucesso",usuario})
         }
         const usuario = await Users.findById(usuarioId);
