@@ -78,7 +78,7 @@ router.put('/updateCpf', auth,async (req, res)=>{
         const usuarioId = res.locals.autenticacao.id
         const user = await Users.findById(usuarioId).select("+senha")
         const senha_teste = await bcrypt.compare(senha, user.senha);
-        if(senha_teste) return res.status(500).send({message:"Senha incorreta"})
+        if(!senha_teste) return res.status(500).send({message:"Senha incorreta"})
         user.cpf = cpf
         user.save()
         user.senha = undefined

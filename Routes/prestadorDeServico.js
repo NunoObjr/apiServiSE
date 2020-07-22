@@ -20,6 +20,18 @@ router.get('/', async (req,res)=>{
     }
 });
 
+router.get('/teste', async (req,res)=>{
+    try{
+        const prestador = await Prestador.findOne({cpf: "066.666.666666"});
+        prestador.rua = 'teste'
+        prestador.save()
+        return res.status(200).send(prestador);
+
+    }catch(error){
+        return res.status(500).send({ error: 'Erro de consulta', erro:error})
+    }
+});
+
 router.post('/create', async (req,res)=>{
     const obj = req.body;
     if(!obj.email || !obj.senha || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) 

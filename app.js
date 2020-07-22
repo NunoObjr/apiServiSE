@@ -7,6 +7,8 @@ const config = require('./config/config')
 const cors = require("cors")
 const bodyParser = require('body-parser')
 const path = require('path')
+const server = require('http').createServer(app)
+const io = require('socket.io')(server);
 
 const url = config.bd_string
 const options = { poolSize: 5, useNewUrlParser:true, useUnifiedTopology:true };
@@ -40,7 +42,17 @@ app.use('/users',usersRoute,express.static(path.resolve(__dirname,"./uploads/"))
 app.use('/servico',servicoRoute)
 app.use('/prestador',prestadorRoute)
 app.use('/users/avl',avaliacaoRoute)
-app.listen(process.env.PORT || 3000);
+
+io.on('connection', (socket) => {
+    console.log('io connected');
+    socket.on('updateStatus', data=>{
+        console.log('entrou no on')
+        console.log(data)
+        socket.broadcast.emit('updatedStatus','teste3')
+    });
+  });
+
+server.listen(process.env.PORT || 3000);
 
 module.exports = app;
 
