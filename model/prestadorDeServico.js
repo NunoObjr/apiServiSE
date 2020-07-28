@@ -9,6 +9,7 @@ const PrestadorSchema = new Schema({
     rua: {type: String, required: true},
     foto: {type: String, required: false},
     complemento: {type: String, required: false},
+    cep:{type: String, required:true},
     telefone: {type: String, required: true},
     cpf: {type: String, required: true, unique:true},
     rendaGerada:{type:Number, required:false, default:0},
