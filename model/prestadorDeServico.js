@@ -7,7 +7,7 @@ const PrestadorSchema = new Schema({
     nome: {type: String, required: true},
     email: {type: String, required: true},
     rua: {type: String, required: true},
-    foto: {type: String, required: false},
+    foto:{type:Schema.Types.ObjectId, required:false, ref: 'Imagem',default:null},
     complemento: {type: String, required: false},
     cep:{type: String, required:true},
     telefone: {type: String, required: true},

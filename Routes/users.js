@@ -28,7 +28,7 @@ router.get('/', async (req,res)=>{
 
 router.post('/create', multer(multerConfig).single('foto'),async (req,res)=>{
     const obj = req.body;
-    if(!obj.email || !obj.senha || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
+    if(!obj.email || !obj.senha || !obj.cep  || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
     if(!(validarCpf(obj.cpf))) return res.status(400).send("Cpf invalido")
     try{
         if(await Users.findOne({cpf:obj.cpf})) return res.status(400).send({error:"Usuario ja existe"})
@@ -107,7 +107,7 @@ router.put('/updatePass', auth,async (req, res)=>{
 
 router.put('/update', auth,multer(multerConfig).single('foto'),async (req, res)=>{
     const obj = req.body;
-    if(!obj.email || !obj.nome  || !obj.senha || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
+    if(!obj.email || !obj.nome || !obj.cep   || !obj.senha || !obj.rua || !obj.telefone) return res.status(400).send({error:"dados insuficientes",body:obj})
     try{
         const usuarioId = res.locals.autenticacao.id
         const user = await Users.findById(usuarioId).select("+senha").populate('foto');
