@@ -231,8 +231,8 @@ router.post('/login', async (req,res)=>{
             permissao_logar:true, nome:user.nome,
             email:user.email,cpf:user.cpf,rua:user.rua,
             complemento:user.complemento,id:user._id,
-            telefone:user.telefone,foto:user.foto == null?null:user.foto.url
-            ,token:createUserToken(user.id)})
+            telefone:user.telefone,foto:user.foto == null?null:user.foto.url,
+            cep:user.cep,token:createUserToken(user.id)})
     }catch(err){
         return res.status(500).send({error: 'erro ao buscar'})
     }
