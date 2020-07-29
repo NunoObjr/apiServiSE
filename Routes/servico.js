@@ -9,9 +9,34 @@ router.get('/', async (req,res)=>{
         return res.send(servicos);
 
     }catch(error){
-        return res.status(500).send({ error: 'Erro de consulta'})
+        return res.status(500).send({ error: 'Erro de consulta', message:error})
     }
 });
+
+router.post('/update', async (req,res)=>{
+    const {ID, action} = req.body
+    if(!ID || !action) return res.status(400).send("Dados insuficientes")
+    try{
+        const servico = await Servico.findById(ID)
+        if(action === 'Recusar'){
+            servico.deleteOne()
+            return res.status(200).send({message:"Servico recusado"});
+        }else if(action === 'Aceitar'){
+            servico.status = 'Agendado'
+            servico.save()
+            return res.status(200).send({message:"Servico agendado"});
+        }else if(action === 'Concluir'){
+            servico.status = 'Concluido'
+            servico.save()
+            return res.status(200).send({message:"Servico concluido"});
+        }else if(action === 'Cancelar'){
+            servico.deleteOne()
+            return res.status(200).send({message:"Servico cancelado"});
+        }
+    }catch(err){
+        return res.status(500).send({error: 'Erro na consultar',message:err})
+    }
+})
 
 router.post('/create', async (req,res)=>{
     const obj = req.body;

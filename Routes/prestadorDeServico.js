@@ -169,6 +169,21 @@ router.get('/identificarUsuario', auth,async (req,res)=>{
 
 })
 
+router.delete('/delete', async (req,res)=>{
+    const {ID} = req.body;
+    if(!ID) return res.status(400).send({error:"dados insuficientes",body:req.body})
+    
+    try{
+        const user = await Prestador.findById(ID)
+       if(!user) return res.status(404).send({error:"Prestador nao existe"})
+
+        user.deleteOne()
+        return res.status(200).send({message:"Prestador removido",user});
+
+    }catch(err){
+        return res.status(500).send({error: 'erro ao criar',erro:err})
+    }
+});
 router.post('/login', async (req,res)=>{
     const {cpf,senha} = req.body;
     if(!cpf || !senha) return res.status(400).send({error:"dados insuficientes"})

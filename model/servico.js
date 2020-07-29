@@ -9,6 +9,7 @@ const ServicoSchema = new Schema({
         hora:{type: String, required:true},
         dia:{type: String, required:true}
     }],
+    status:{type:String,default:'Pendente'},
     avaliacao: [{type: Schema.Types.ObjectId, required:false, ref:'Avaliacao'}],
     prestador: {type: Schema.Types.ObjectId, required:true, ref:'Prestador'},
     created: {type: Date, default:Date.now}
