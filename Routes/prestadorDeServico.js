@@ -7,6 +7,7 @@ const auth = require('../middleware/auth')
 const config = require('../config/config')
 const Imagem = require("../model/imagem")
 const multer = require('multer')
+const validarCpf = require('validar-cpf');
 const multerConfig = require('../multerConfig/multer')
 
 const createUserToken = (userId)=>{
@@ -62,10 +63,10 @@ router.post('/create',multer(multerConfig).single('foto'), async (req,res)=>{
     const obj = req.body;
     if(!obj.email || !obj.senha || !obj.cep || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone || !req.file) 
         return res.status(400).send({error:"dados insuficientes",body:obj})
-    
+    if(!(validarCpf(obj.cpf))) return res.status(400).send("Cpf invalido")
     try{
        if(await Prestador.findOne({cpf:obj.cpf})) return res.status(400).send({error:"Prestador ja existe"})
-
+        
         const prestador = await  Prestador.create(req.body)
         const { originalname: name, size,filename: key, location: url = "" } = req.file;
             const imagem = await Imagem.create({
