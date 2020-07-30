@@ -45,10 +45,32 @@ app.use('/users/avl',avaliacaoRoute)
 
 io.on('connection', (socket) => {
     console.log('io connected');
-    socket.on('updateStatus', data=>{
-        console.log('entrou no on')
-        console.log(data)
-        socket.broadcast.emit('updatedStatus','teste3')
+    socket.on('atualizouPerfilPrestador',data=>{
+        socket.broadcast.emit('perfilAtualizadoPrestador',data)
+    });
+    socket.on('statusServicoMudou',data=>{
+        socket.broadcast.emit('statusServicoMudado',data)
+    });
+    socket.on('criouServico',data=>{
+        socket.broadcast.emit('servicoCriado',data)
+    });
+    socket.on('excluiuServico',data=>{
+        socket.broadcast.emit('servicoExcluido',data)
+    });
+    socket.on('excluiuPrestador',data=>{
+        socket.broadcast.emit('prestadorExcluido',data)
+    })
+    socket.on('agendouServico',data=>{
+        socket.broadcast.emit('servicoAgendado',data)
+    });
+    socket.on('usuarioCancelouAgendamento',data=>{
+        socket.broadcast.emit('agendamentoCanceladoUsuario',data)
+    });
+    socket.on('novaAvaliacao',data=>{
+        socket.broadcast.emit('avaliacaoCriada',data)
+    });
+    socket.on('atualizouPerfilUsuario',data=>{
+        socket.broadcast.emit('perfilAtualizadoUsuario',data)
     });
   });
 
