@@ -62,7 +62,7 @@ router.put('/updatePass', auth,async (req, res)=>{
 router.post('/create',multer(multerConfig).single('foto'), async (req,res)=>{
     const obj = req.body;
     if(!obj.email || !obj.senha || !obj.cep || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone || !req.file) 
-        return res.status(400).send({error:"dados insuficientes",body:obj})
+        return res.status(400).send({error:"dados insuficientes",body:obj,file:req.file})
     if(!(validarCpf(obj.cpf))) return res.status(400).send("Cpf invalido")
     try{
        if(await Prestador.findOne({cpf:obj.cpf})) return res.status(400).send({error:"Prestador ja existe"})
