@@ -61,8 +61,11 @@ router.put('/updatePass', auth,async (req, res)=>{
 })
 router.post('/create',multer(multerConfig).single('foto'), async (req,res)=>{
     const obj = req.body;
+    console.log(req.file)
+    console.log(obj)
+    console.log('')
     if(!obj.email || !obj.senha || !obj.cep || !obj.nome || !obj.cpf || !obj.rua || !obj.telefone || !req.file) 
-        return res.status(400).send({error:"dados insuficientes",body:obj,file:req.file})
+        return res.status(400).send({error:"dados insuficientes",body:obj})
     if(!(validarCpf(obj.cpf))) return res.status(400).send("Cpf invalido")
     try{
        if(await Prestador.findOne({cpf:obj.cpf})) return res.status(400).send({error:"Prestador ja existe"})
@@ -188,7 +191,7 @@ router.post('/login', async (req,res)=>{
     const {cpf,senha} = req.body;
     if(!cpf || !senha) return res.status(400).send({error:"dados insuficientes"})
     try{
-        const user =  await Prestador.findOne({cpf}).select("+senha").populate('foto')
+        const user =  await Prestador.findOne({cpf}).select("+senha").populate('foto').populate('servicos')
         if(!user) return res.status(401).send({error: 'dados invalidos'})
         const senha_teste = await bcrypt.compare(senha, user.senha);
         if(!senha_teste) return res.status(401).send({permissao_logar:false,error: 'dados invalidos'})

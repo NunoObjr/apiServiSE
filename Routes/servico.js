@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Servico = require('../model/servico');
 const Prestador = require('../model/prestadorDeServico')
+const bcrypt = require('bcrypt')
 
 router.get('/', async (req,res)=>{
     try{
@@ -42,14 +43,16 @@ router.post('/create', async (req,res)=>{
     const obj = req.body;
     if(!obj.nome || !obj.preco || !obj.prestador || !obj.horario || !obj.senha) return res.status(400).send({error:"dados insuficientes",body:obj})
     
-
     try{
        const prestadorDeServico = await Prestador.findById(obj.prestador).select("+senha")
         if(!prestadorDeServico) return res.status(400).send({error:"Prestador de servico nao encontrado"})
         if(await Servico.findOne({nome:obj.nome,prestador:obj.prestador})) return res.status(400).send({error:"Servico ja existe"})
         const senha_teste = await bcrypt.compare(obj.senha, prestadorDeServico.senha);
         if(!senha_teste) return res.status(500).send({message:"Senha incorreta"})
-        const newServico = await Servico.create(req.body)
+        console.log('ate la')
+        const newServico = await Servico.create(obj)
+        console.log('kk')
+        console.log(obj)
         prestadorDeServico.servicos.push(newServico)
         prestadorDeServico.save()
         return res.status(201).send({newServico});
