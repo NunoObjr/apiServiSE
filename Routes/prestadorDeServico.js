@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Prestador = require('../model/prestadorDeServico')
+const ServicoAgendado = require('../model/servicoAgendado')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const auth = require('../middleware/auth')
@@ -179,11 +180,12 @@ router.post('/login', async (req,res)=>{
     try{
         const user =  await Prestador.findOne({cpf}).select("+senha").populate('foto').populate('servicos')
         if(!user) return res.status(401).send({error: 'dados invalidos'})
+        const servicosAgendados = await ServicoAgendado.find({prestador:user._id})
         const senha_teste = await bcrypt.compare(senha, user.senha);
         if(!senha_teste) return res.status(401).send({permissao_logar:false,error: 'dados invalidos'})
         return res.status(200).send({
             permissao_logar:true, servicos:user.servicos, nome:user.nome,
-            email:user.email,cpf:user.cpf,rua:user.rua,
+            email:user.email,cpf:user.cpf,rua:user.rua, servicosAgendados,
             complemento:user.complemento,id:user._id,
             telefone:user.telefone,foto:user.foto == null?null:user.foto.url,
             cep:user.cep

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Servico = require('../model/servico');
+const ServicoAgendado = require('../model/servicoAgendado')
 const Prestador = require('../model/prestadorDeServico')
 const bcrypt = require('bcrypt')
 
@@ -14,11 +15,13 @@ router.get('/', async (req,res)=>{
     }
 });
 
+//falta personalizar o servicoAgendado
+
 router.post('/update', async (req,res)=>{
     const {ID, action} = req.body
     if(!ID || !action) return res.status(400).send("Dados insuficientes")
     try{
-        const servico = await Servico.findById(ID)
+        const servico = await ServicoAgendado.findById(ID)
         if(action === 'Recusar'){
             servico.deleteOne()
             return res.status(200).send({message:"Servico recusado"});
