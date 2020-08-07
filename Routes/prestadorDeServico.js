@@ -159,6 +159,18 @@ router.get('/identificarUsuario', auth,async (req,res)=>{
 
 })
 
+
+router.get('/servicosAgendados', auth,async (req,res)=>{
+    try{
+        const usuarioId = res.locals.autenticacao.id
+        const user = await Prestador.findById(usuarioId)
+        return res.send({servicosAgendados:user.servicosAgendados})
+    }catch(error){
+        return res.status(500).send({error: "houve uma falha de autenticacao"})
+    }
+
+})
+
 router.delete('/delete', async (req,res)=>{
     const {ID} = req.body;
     if(!ID) return res.status(400).send({error:"dados insuficientes",body:req.body})
