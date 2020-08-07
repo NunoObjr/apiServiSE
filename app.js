@@ -60,7 +60,7 @@ io.on('connection', (socket) => {
     socket.on('excluiuPrestador',data=>{
         socket.broadcast.emit('prestadorExcluido',data)
     })
-    socket.on('agendouServico',data=>{
+    socket.once('agendouServico',data=>{
         socket.broadcast.emit('servicoAgendado',data)
     });
     socket.on('usuarioCancelouAgendamento',data=>{
