@@ -164,7 +164,7 @@ router.get('/servicosAgendados', auth,async (req,res)=>{
     try{
         const usuarioId = res.locals.autenticacao.id
         const user = await Prestador.findById(usuarioId)
-        return res.send({servicosAgendados:user.servicosAgendados})
+        return res.status(200).send({servicosAgendados:user.servicosAgendados})
     }catch(error){
         return res.status(500).send({error: "houve uma falha de autenticacao"})
     }
