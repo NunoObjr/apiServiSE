@@ -61,9 +61,11 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('prestadorExcluido',data)
     })
     socket.on('agendouServico',data=>{
+        console.log('agendouServico')
         socket.broadcast.emit('servicoAgendado',data)
     });
     socket.on('usuarioCancelouAgendamento',data=>{
+        console.log('usuarioCancelouAgendamento')
         socket.broadcast.emit('agendamentoCanceladoUsuario',data)
     });
     socket.on('novaAvaliacao',data=>{

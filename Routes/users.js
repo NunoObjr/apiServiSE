@@ -166,8 +166,19 @@ router.post('/agendar', auth,async (req,res)=>{
     const {nome,preco,prestador,usuario,horario} = req.body;
     if(!nome || !preco || !prestador || !usuario|| !horario) return res.status(400).send({error:"dados insuficientes"})
     try{
-        const user = await Users.findById(usuario)
+        const user = await Users.findById(usuario).populate('agendamentos')
         if(!user) res.status(404).send({error:"Usuario nao encontrado"})
+        console.log(user.agendamentos.length)
+        for(let i=0; i<user.agendamentos.length;i++){
+            console.log(i)
+            console.log(user.agendamentos[i].nome === nome)
+            console.log(user.agendamentos[i].prestador.equals(prestador))
+            if(user.agendamentos[i].nome === nome && user.agendamentos[i].prestador.equals(prestador)){
+                console.log('mundo')
+                return res.status(400).send({error:"Servico já agendado"})
+            }
+        }
+        console.log('teste')
         const prest = await Prestador.findById(prestador)
         if(!prest) res.status(404).send({error:"Prestador nao encontrado"})
         const servicoAgendado = await ServicoAgendado.create(req.body)
@@ -198,6 +209,7 @@ router.delete('/cancelarAgendamento', auth, async(req,res)=>{
     if(!idAgendamento) return res.status(400).send({error:"dados insuficientes"})
     try{
         const agendamento = await ServicoAgendado.findById(idAgendamento).populate('prestador')
+        const prest = await Prestador.findById(agendamento.prestador._id).populate('servicos')
         if(agendamento.status !== "Pendente") return res.status(400).send({error:"So é possivel cancelar um agendamento pendente"})
         const usuarioId = res.locals.autenticacao.id
         const user = await Users.findById(usuarioId)
@@ -205,14 +217,19 @@ router.delete('/cancelarAgendamento', auth, async(req,res)=>{
         for(let i=0; i<user.agendamentos.length;i++){
             if(!user.agendamentos[0].equals(idAgendamento)) novoVetor.push(user.agendamentos[i])
         }
+        let resposta = null
+        for(let i=0; i<prest.servicos.length;i++){
+            if(prest.servicos[i].nome ===agendamento.nome){
+                resposta = prest.servicos[i]._id
+            }
+        }
         agendamento.deleteOne()
         user.agendamentos = novoVetor
         user.save()
-        const prest = await Prestador.findById(agendamento.prestador._id)
         const valor = prest.servicosCanceladosUsuario
         prest.servicosCanceladosUsuario = valor +1
         prest.save()
-        return res.status(200).send("Servico cancelado")
+        return res.status(200).send({message:"Servico cancelado",resposta})
     }catch(err){
         return res.status(500).send({message:"Não foi possivel cancelar o agendamento",error:err})
     }
