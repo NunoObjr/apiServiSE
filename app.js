@@ -29,7 +29,7 @@ mongoose.connection.on('connected',()=>{
 })
 app.use(cors())
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const indexRoute = require('./Routes/index');
 const usersRoute = require('./Routes/users');

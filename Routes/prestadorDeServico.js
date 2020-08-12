@@ -192,7 +192,7 @@ router.post('/login', async (req,res)=>{
     try{
         const user =  await Prestador.findOne({cpf}).select("+senha").populate('foto').populate('servicos')
         if(!user) return res.status(401).send({error: 'dados invalidos'})
-        const servicosAgendados = await ServicoAgendado.find({prestador:user._id})
+        const servicosAgendados = await ServicoAgendado.find({prestador:user._id}).populate('usuario')
         const senha_teste = await bcrypt.compare(senha, user.senha);
         if(!senha_teste) return res.status(401).send({permissao_logar:false,error: 'dados invalidos'})
         return res.status(200).send({
