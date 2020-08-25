@@ -36,12 +36,14 @@ const usersRoute = require('./Routes/users');
 const servicoRoute = require('./Routes/servico');
 const prestadorRoute = require('./Routes/prestadorDeServico');
 const avaliacaoRoute = require('./Routes/avaliacao')
+const hackapp = require('./Routes/hackapp')
 
 app.use('/',indexRoute)
 app.use('/users',usersRoute,express.static(path.resolve(__dirname,"./uploads/")))
 app.use('/servico',servicoRoute)
 app.use('/prestador',prestadorRoute)
 app.use('/users/avl',avaliacaoRoute)
+app.use('/hackApp',hackapp)
 
 io.on('connection', (socket) => {
     console.log('io connected');
@@ -76,7 +78,7 @@ io.on('connection', (socket) => {
     });
   });
 
-server.listen(process.env.PORT || 3000);
+server.listen(process.env.PORT || 3001);
 
 module.exports = app;
 
