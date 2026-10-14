@@ -71,18 +71,17 @@ npm install
 npm start
 ```
 
-Configuração esperada por variáveis de ambiente (arquivo `.env`, já ignorado pelo Git):
+Copie `.env.example` para `.env` (já ignorado pelo Git) e preencha:
 
 | Variável | Uso |
 | --- | --- |
-| string de conexão do MongoDB | banco de dados |
-| segredo do JWT | assinatura dos tokens |
-| `BUCKET_NAME` e credenciais AWS | upload no S3 (opcional) |
+| `MONGO_URI` | string de conexão do MongoDB |
+| `JWT_SECRET` | segredo de assinatura dos tokens JWT |
+| `JWT_EXPIRES_IN` | validade dos tokens (opcional, padrão `7d`) |
+| `BUCKET_NAME`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | upload no S3 (opcional) |
 
-## Segurança — atenção
+## Segurança
 
-O arquivo `config/config.js` ainda contém a string de conexão do banco e o segredo do JWT **escritos no código**. Antes de qualquer uso real:
+Nenhum segredo fica no código: `config/config.js` lê tudo de `process.env`. Em produção (ex.: Heroku), defina as mesmas variáveis como *config vars*.
 
-1. **Revogue** a senha do usuário do MongoDB e **troque** o segredo do JWT;
-2. Passe esses valores para variáveis de ambiente (`process.env`);
-3. Remova os segredos do histórico do Git, se necessário.
+> Credenciais que já foram versionadas continuam no histórico do Git. **Revogue a senha do usuário do MongoDB e troque o segredo do JWT** antes de usar este projeto de novo.
